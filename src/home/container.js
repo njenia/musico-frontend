@@ -1,29 +1,29 @@
 import {connect} from "react-redux"
 
 import Home from "./view"
-import { loadPage, movePageBy } from "./actions"
+import { loadPage, setCurrentPage } from "./actions"
 import { getSongs } from "../store/entities/song"
 
 const mapStateToProps = ({
   home: {
-    pages, currentPage, songsCount, maxPage, isLoading
+    pages, currentPage, songsCount, maxPage, isPageLoading, isStatsLoading
   },
   entities: { songs }
 }) => ({
   songs: getSongs(songs, pages[currentPage]),
-  currentPage: currentPage,
-  songsCount: songsCount,
-  maxPage: maxPage,
-  isLoading: isLoading
+  currentPage,
+  songsCount,
+  maxPage,
+  isStatsLoading,
+  isPageLoading
 })
 
 const mapDispatchToProps = {
   loadPage,
-  onMoveOneLeftClick: () => movePageBy({steps: -1}),
-  onMoveOneRightClick: () => movePageBy({steps: 1}),
+  moveToPage: page => setCurrentPage({page}),
 }
 
-export default connect(
+export const HomeContainer = connect(
   mapStateToProps,
   mapDispatchToProps
 )(Home)

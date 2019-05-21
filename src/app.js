@@ -3,7 +3,7 @@ import {Provider} from 'react-redux'
 import store from './store'
 import {Router} from "@reach/router"
 
-import HomeContainer from './home/container'
+import { HomeContainer } from './home'
 import { SongPlayerContainer } from './song-player'
 
 
@@ -17,3 +17,4 @@ const App = () => (
 )
 
 export default App
+

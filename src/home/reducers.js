@@ -1,18 +1,24 @@
-import {SET_IS_LOADING, SET_CURRENT_PAGE, SET_PAGE_DATA, MOVE_PAGE_BY} from './actions'
+import { SET_PAGE_IS_LOADING, SET_STATS_IS_LOADING, SET_CURRENT_PAGE, SET_PAGE_DATA, SET_STATS } from './actions'
 
 const initialState = {
-  isLoading: false,
+  isPageLoading: null,
+  isStatsLoading: null,
   pages: {},
   currentPage: 0,
   maxPage: null,
   songsCount: null
 }
-const homeReducer = (state = initialState, action) => {
+export const homeReducer = (state = initialState, action) => {
   switch (action.type) {
-    case SET_IS_LOADING:
+    case SET_PAGE_IS_LOADING:
       return {
         ...state,
-        isLoading: action.isLoading
+        isPageLoading: action.isPageLoading
+      }
+    case SET_STATS_IS_LOADING:
+      return {
+        ...state,
+        isStatsLoading: action.isStatsLoading
       }
     case SET_PAGE_DATA:
       return {
@@ -20,7 +26,11 @@ const homeReducer = (state = initialState, action) => {
         pages: {
           ...state.pages,
           [action.page]: action.songIds
-        },
+        }
+      }
+    case SET_STATS:
+      return {
+        ...state,
         songsCount: action.songsCount,
         maxPage: action.maxPage
       }
@@ -29,14 +39,7 @@ const homeReducer = (state = initialState, action) => {
         ...state,
         currentPage: action.page
       }
-    case MOVE_PAGE_BY:
-      return {
-        ...state,
-        currentPage: state.currentPage + action.steps
-      }
     default:
       return state
   }
 }
-
-export default homeReducer

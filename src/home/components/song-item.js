@@ -1,25 +1,17 @@
 import React from 'react'
-import styled from 'styled-components'
+import ListItem from "@material-ui/core/ListItem/ListItem"
+import ListItemText from "@material-ui/core/ListItemText/ListItemText"
+import { LibraryMusic } from '@material-ui/icons';
+import ListItemIcon from "@material-ui/core/ListItemIcon/ListItemIcon"
 
-const SongItem = ({artist, title}) => (
-  <SongItemContainer>
-    <SongItemArtist>{artist}</SongItemArtist>
-    <SongItemTitle>{title}</SongItemTitle>
-  </SongItemContainer>
+
+const SongItem = ({artist, title, onSongClick}) => (
+  <ListItem button onClick={onSongClick}>
+    <ListItemIcon>
+      <LibraryMusic />
+    </ListItemIcon>
+    <ListItemText primary={title} secondary={artist} />
+  </ListItem>
 )
-
-const SongItemContainer = styled.div`
-  background-color: gray;
-  padding: 10px 25px;
-`
-
-const SongItemArtist = styled.div`
-  text-decoration: italic;
-`
-
-const SongItemTitle = styled.div`
-  text-decoration: bold;
-`
-
 
 export default SongItem

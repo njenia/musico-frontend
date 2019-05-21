@@ -1,30 +1,38 @@
 import React from 'react'
 import styled from 'styled-components'
-import { ChevronLeft, ChevronRight } from '@material-ui/icons';
+import { ChevronLeft, ChevronRight, FirstPage, LastPage } from '@material-ui/icons';
+import Typography from "@material-ui/core/Typography/Typography"
 
-
-const Pagination = ({ maxPage, currentPage, onMoveOneLeftClick, onMoveOneRightClick }) => (
+const Pagination = ({
+  maxPage,
+  currentPage,
+  moveToPage
+}) => (
   <PaginationContainer>
-    <MoveOneLeft disabled={currentPage === 0} onClick={onMoveOneLeftClick} />
-    Page {currentPage + 1}
-    <MoveOneRight disabled={currentPage === maxPage} onClick={onMoveOneRightClick} />
+    <NavigationButton disabled={currentPage === 0} onClick={() => moveToPage(0)}>
+      <FirstPage fontSize="large" />
+    </NavigationButton>
+    <NavigationButton disabled={currentPage === 0} onClick={() => moveToPage(currentPage - 1)}>
+      <ChevronLeft fontSize="large" />
+    </NavigationButton>
+    <Typography variant="subtitle1">Page {currentPage + 1} / {maxPage + 1}</Typography>
+    <NavigationButton disabled={currentPage === maxPage} onClick={() => moveToPage(currentPage + 1)}>
+      <ChevronRight fontSize="large" />
+    </NavigationButton>
+    <NavigationButton disabled={currentPage === maxPage} onClick={() => moveToPage(maxPage)}>
+      <LastPage fontSize="large" />
+    </NavigationButton>
   </PaginationContainer>
 )
 
 const PaginationContainer = styled.div`
-  border: 1px solid black;
   display: flex;
   justify-content: center;
+  align-items: center;
 `
 
-const MoveOneLeft = styled(ChevronLeft)`
-  color: ${props => props.disabled ? 'gray' : 'black'};
-  pointer-events: ${props => props.disabled ? 'none' : 'default'};
-  cursor: ${props => props.disabled ? 'default' : 'pointer'};
-`
-
-const MoveOneRight = styled(ChevronRight)`
-  color: ${props => props.disabled ? 'gray' : 'black'};
+const NavigationButton = styled.div`
+  opacity: ${props => props.disabled ? 0.25 : 1};
   pointer-events: ${props => props.disabled ? 'none' : 'default'};
   cursor: ${props => props.disabled ? 'default' : 'pointer'};
 `

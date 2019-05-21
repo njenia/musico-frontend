@@ -1,19 +1,29 @@
 import fetch from 'cross-fetch'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
+import isNil from 'lodash/isNil'
 
-import { setSongs } from '../store/entities/song'
+import { fetchSongs } from '../store/entities/song'
+import { API_URL_FRAGMENT } from "../common/constants"
 
 
-export const SET_IS_LOADING = 'SET_IS_LOADING'
-export const SET_PAGE_DATA = 'SET_PAGE_DATA'
-export const SET_CURRENT_PAGE = 'SET_CURRENT_PAGE'
-export const MOVE_PAGE_BY = 'MOVE_PAGE_BY'
+export const SET_PAGE_IS_LOADING = 'HOME/SET_PAGE_IS_LOADING'
+export const SET_STATS_IS_LOADING = 'HOME/SET_STATS_IS_LOADING'
+export const SET_PAGE_DATA = 'HOME/SET_PAGE_DATA'
+export const SET_CURRENT_PAGE = 'HOME/SET_CURRENT_PAGE'
+export const SET_STATS = 'HOME/SET_STATS'
 
-export function setIsLoading({isLoading}) {
+export function setPageIsLoading({isPageLoading}) {
   return {
-    type: SET_IS_LOADING,
-    isLoading
+    type: SET_PAGE_IS_LOADING,
+    isPageLoading
+  }
+}
+
+export function setStatsIsLoading({isStatsLoading}) {
+  return {
+    type: SET_STATS_IS_LOADING,
+    isStatsLoading
   }
 }
 
@@ -24,41 +34,57 @@ export function setCurrentPage({page}) {
   }
 }
 
-export function movePageBy({steps}) {
-  return {
-    type: MOVE_PAGE_BY,
-    steps
-  }
-}
-
-export function setPageData({ count, maxPage, page, songIds }) {
+export function setPageData({ page, songIds }) {
   return {
     type: SET_PAGE_DATA,
-    songsCount: count,
-    maxPage,
     songIds,
     page
   }
 }
 
+export function setStats({ count, maxPage }) {
+  return {
+    type: SET_STATS,
+    songsCount: count,
+    maxPage
+  }
+}
+
 export function loadPage(page) {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const { home: { pages } } = getState()
     if (isEmpty(pages[page])) {
-      dispatch(setIsLoading({isLoading: true}))
-      return fetch(`/api/songs?page=${page}`)
-        .then(response => response.json())
-        .then(result => {
-          dispatch(setSongs({songs: result.songs}))
-          dispatch(setPageData({
-            count: result.count,
-            maxPage: result.maxPage,
-            page,
-            songIds: map(result.songs, 'id')}))
-          return dispatch(setIsLoading({isLoading: false}))
-        })
+      dispatch(setPageIsLoading({isPageLoading: true}))
+      // Missing error handling
+      const result = await dispatch(fetchSongs({page}))
+      dispatch(setPageData({
+        songIds: map(result.songs, 'id'),
+        page
+      }))
+      dispatch(setCurrentPage({page}))
+
+      await dispatch(fetchStatsIfNeeded())
+
+      dispatch(setPageIsLoading({isPageLoading: false}))
     } else {
-      return dispatch(setCurrentPage({page}))
+      dispatch(setCurrentPage({page}))
+    }
+  }
+}
+
+function fetchStatsIfNeeded() {
+  return async (dispatch, getState) => {
+    const { home: { songsCount } } = getState()
+    if (isNil(songsCount)) {
+      dispatch(setStatsIsLoading({isStatsLoading: true}))
+      // Missing error handling
+      const response = await fetch(`${API_URL_FRAGMENT}/songs/stats`)
+      const result = await response.json()
+      dispatch(setStats({
+        count: result.count,
+        maxPage: result.maxPage
+      }))
+      dispatch(setStatsIsLoading({isStatsLoading: false}))
     }
   }
 }

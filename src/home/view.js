@@ -1,45 +1,55 @@
 import React from 'react'
-import {Link} from '@reach/router'
+import List from "@material-ui/core/List/List"
+import Typography from "@material-ui/core/Typography/Typography"
+import CircularProgress from "@material-ui/core/CircularProgress/CircularProgress"
 
 import SongItem from "./components/song-item"
 import Pagination from "./components/pagination"
 
 class Home extends React.Component {
-  componentWillMount() {
+  componentDidMount() {
     const { loadPage, currentPage } = this.props
+
     loadPage(currentPage || 0)
   }
 
   componentDidUpdate(prevProps) {
     const { loadPage, currentPage } = this.props
+
     if (currentPage !== prevProps.currentPage) {
-      console.log('did UODATE')
-      console.log(currentPage)
-      console.log(prevProps.currentPage)
-      loadPage(currentPage || 0)
+      loadPage(currentPage)
     }
   }
 
   render() {
-    const {songs, songsCount, currentPage, maxPage, onMoveOneLeftClick, onMoveOneRightClick} = this.props
-    return maxPage != null ? (
+    const {
+      songs,
+      songsCount,
+      currentPage,
+      maxPage,
+      moveToPage,
+      navigate,
+      isStatsLoading,
+      isPageLoading
+    } = this.props
+    return !isStatsLoading ? (
       <React.Fragment>
-        <div>Total songs: {songsCount}</div>
-        {
-          songs.map(song => <div key={song.id}>
-            <Link to={`song/${song.id}`}>
-              <SongItem artist={song.artist} title={song.title}/>
-            </Link>
-          </div>)
-        }
+        <Typography variant="caption">Total songs: {songsCount}</Typography>
+        { !isPageLoading ?
+          <List>
+          {
+            songs.map(song => <div key={song.id}>
+              <SongItem onSongClick={() => navigate(`song/${song.id}`)} artist={song.artist} title={song.title}/>
+            </div>)
+          }
+          </List> : <CircularProgress /> }
         <Pagination
           maxPage={maxPage}
           currentPage={currentPage}
-          onMoveOneLeftClick={onMoveOneLeftClick}
-          onMoveOneRightClick={onMoveOneRightClick}
+          moveToPage={moveToPage}
         />
       </React.Fragment>
-    ) : null
+    ) : <CircularProgress />
   }
 }
 
